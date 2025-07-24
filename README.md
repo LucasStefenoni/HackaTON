@@ -1,3 +1,4 @@
 # HackaTON
 SplitBill é um mini-app do Telegram que permite a amigos registrarem e dividirem despesas em grupo de forma inteligente, prática e descentralizada. Seja em viagens, rolês, festas, pedidos coletivos ou eventos, os usuários escrevem mensagens em linguagem natural explicando o que pagaram, e um modelo de linguagem (LLM) interpreta essas informações para calcular automaticamente quanto cada pessoa deve aos demais.
+
 O app oferece um acompanhamento individual dos gastos e contas, onde cada membro visualiza seu histórico de contribuições, o que ainda deve ou tem a receber, e pode pagar diretamente dentro do Telegram via carteiras integradas com Toncoin ou stablecoins (jUSDT). Toda a experiência acontece no próprio Telegram, com uma interface amigável, sem fricções e com o poder da Web3 nos bastidores.
