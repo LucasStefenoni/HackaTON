@@ -41,7 +41,7 @@ Gerencia as interações com os usuários, aciona o LLM, atualiza os dados e int
 ### 3. LLM (Processamento de linguagem natural)
 Recebe frases do usuário, identifica quem pagou, o valor, os envolvidos e responde com a divisão correta da despesa.
 
-🔗 Repositório: _(em breve)_  
+🔗 Repositório: [HackatonLLM](https://github.com/AbnerEffgen/HackatonLLM)  
 ☁️ Hospedagem: Container no Railway
 
 ---
@@ -49,7 +49,7 @@ Recebe frases do usuário, identifica quem pagou, o valor, os envolvidos e respo
 ### 4. TonVerifyPaymentPolling (Verificação de Pagamentos)
 Monitora a blockchain da TON para identificar pagamentos em Toncoin ou jUSDT, e vincula os valores quitados ao sistema de dívidas do app.
 
-🔗 Repositório: _(em breve)_  
+🔗 Repositório: [HackathonTransferencePolling](https://github.com/senderro/HackathonTransferencePolling) 
 ☁️ Hospedagem: _(em breve)_
 
 ---
@@ -58,12 +58,13 @@ Monitora a blockchain da TON para identificar pagamentos em Toncoin ou jUSDT, e 
 
 - Telegram Mini App (HTML5 + JS)
 - Telegram Bot API
-- OpenAI / LLMs
+- Gemini (Python) / Google AI Studio / LLMs
 - TON Blockchain (Toncoin, jUSDT)
 - Carteiras Ton nativas no Telegram
 - Railway (backend/LLM)
 - Vercel (frontend)
-
+- Docker
+  
 ---
 
 ## 🛠 Como usar
