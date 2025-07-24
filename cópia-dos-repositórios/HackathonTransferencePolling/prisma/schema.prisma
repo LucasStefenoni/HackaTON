@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model bag_users {
+  bag_id      Int
+  user_id     BigInt
+  joined_at   DateTime @default(now())
+  total_spent Float?   @default(0)
+  bags        bags     @relation(fields: [bag_id], references: [id], onDelete: Cascade)
+  users       users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([bag_id, user_id])
+}
+
+model bags {
+  id                 Int                @id @default(autoincrement())
+  chat_id            BigInt             @unique
+  name               String
+  admin_user_id      BigInt
+  created_at         DateTime           @default(now())
+  welcome_message_id BigInt?
+  state              ChatState          @default(BOT_ADDED)
+  bag_users          bag_users[]
+  users              users              @relation(fields: [admin_user_id], references: [id])
+  pending_payments   pending_payments[]
+  transactions       transactions[]
+}
+
+model pending_payments {
+  id                                         Int       @id @default(autoincrement())
+  bag_id                                     Int
+  user_id_from                               BigInt
+  user_id_to                                 BigInt
+  valor                                      Decimal   @db.Decimal(10, 2)
+  pago                                       Boolean   @default(false)
+  data_pagamento                             DateTime?
+  pollAttempts                               Int       @default(0)
+  txHash                                     String?
+  user_to_address                            String?
+  bags                                       bags      @relation(fields: [bag_id], references: [id], onDelete: Cascade)
+  users_pending_payments_user_id_fromTousers users     @relation("pending_payments_user_id_fromTousers", fields: [user_id_from], references: [id], onDelete: Cascade)
+  users_pending_payments_user_id_toTousers   users     @relation("pending_payments_user_id_toTousers", fields: [user_id_to], references: [id], onDelete: Cascade)
+}
+
+model transactions {
+  id           Int      @id @default(autoincrement())
+  bag_id       Int
+  user_id      BigInt
+  message_text String
+  created_at   DateTime @default(now())
+  bags         bags     @relation(fields: [bag_id], references: [id], onDelete: Cascade)
+  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model user_aliases {
+  id      Int    @id @default(autoincrement())
+  user_id BigInt
+  alias   String
+  users   users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id                                                    BigInt             @id
+  username                                              String?
+  first_name                                            String?
+  last_name                                             String?
+  created_at                                            DateTime           @default(now())
+  wallet_address                                        String?
+  bag_users                                             bag_users[]
+  bags                                                  bags[]
+  pending_payments_pending_payments_user_id_fromTousers pending_payments[] @relation("pending_payments_user_id_fromTousers")
+  pending_payments_pending_payments_user_id_toTousers   pending_payments[] @relation("pending_payments_user_id_toTousers")
+  transactions                                          transactions[]
+  user_aliases                                          user_aliases[]
+}
+
+enum ChatState {
+  BOT_ADDED
+  AWAITING_CREATE
+  AWAITING_NAME
+  BAG_CREATED
+  AWAITING_PAYMENTS
+  BAG_FINISHED
+}

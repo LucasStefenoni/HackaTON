@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  # Nome do nosso serviço
+  api:
+    # Constrói a imagem a partir do Dockerfile no diretório atual ('.')
+    build: .
+    
+    # Nome para a imagem que será construída
+    image: gemini-gastos-api
+    
+    # Nome do container quando estiver em execução
+    container_name: api-hackaton-llm
+
+    # Mapeia a porta 5000 do host para a porta 5000 do container
+    ports:
+      - "5000:5000"
+
+    # Carrega as variáveis de ambiente do arquivo .env
+    env_file:
+      - .env

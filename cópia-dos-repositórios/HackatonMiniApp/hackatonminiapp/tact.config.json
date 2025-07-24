@@ -1,0 +1,10 @@
+{
+  "$schema": "http://raw.githubusercontent.com/tact-lang/tact/main/src/config/configSchema.json",
+  "projects": [
+    {
+      "name":   "FeePayment",                        
+      "path":   "contracts/fee_payment.tact",        
+      "output": "contracts/build"                     
+    }
+  ]
+}

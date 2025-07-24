@@ -1,0 +1,30 @@
+{
+  "name": "ton-polling-service",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepare": "prisma db pull && prisma generate",
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prisma:pull": "prisma db pull",
+    "prisma:generate": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.12.0",
+    "@ton/core": "^0.61.0",
+    "@ton/ton": "^15.3.1",
+    "@types/node": "^24.0.15",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "prisma": "^6.11.1",
+    "ton-crypto": "^3.2.0",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "prisma": "^6.11.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.2"
+  }
+}

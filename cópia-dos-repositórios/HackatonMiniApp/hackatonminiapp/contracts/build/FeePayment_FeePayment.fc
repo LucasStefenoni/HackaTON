@@ -1,0 +1,277 @@
+#pragma version =0.4.6;
+#pragma allow-post-modification;
+#pragma compute-asm-ltr;
+
+;; FeePayment_FeePayment.headers.fc
+;;
+;; Header files for FeePayment
+;; NOTE: declarations are sorted for optimal order
+;;
+
+;; __tact_context_get
+(int, slice, int, slice) __tact_context_get() inline;
+
+;; __tact_context_get_sender
+slice __tact_context_get_sender() inline;
+
+;; $FeePayment$_store
+builder $FeePayment$_store(builder build_0, (slice, int, int) v) inline;
+
+;; $FeePayment$_load
+(slice, ((slice, int, int))) $FeePayment$_load(slice sc_0) inline;
+
+;; $Context$_get_value
+_ $Context$_get_value((int, slice, int, slice) v) inline;
+
+;; $FeePayment$_contract_load
+(slice, int, int) $FeePayment$_contract_load() impure inline;
+
+;; $FeePayment$_contract_store
+() $FeePayment$_contract_store((slice, int, int) v) impure inline;
+
+;; $FeePayment$_fun_getFeeNumerator
+((slice, int, int), int) $FeePayment$_fun_getFeeNumerator((slice, int, int) $self) impure inline_ref;
+
+;; $FeePayment$_fun_getFeeDenominator
+((slice, int, int), int) $FeePayment$_fun_getFeeDenominator((slice, int, int) $self) impure inline_ref;
+
+;; $SendParameters$_constructor_to_value_bounce_mode
+((int, cell, cell, cell, int, slice, int)) $SendParameters$_constructor_to_value_bounce_mode(slice $to, int $value, int $bounce, int $mode) inline;
+
+
+;; FeePayment_FeePayment.stdlib.fc
+global (int, slice, int, slice) __tact_context;
+global slice __tact_context_sender;
+global cell __tact_child_contract_codes;
+global int __tact_randomized;
+
+(int, slice, int, slice) __tact_context_get() inline {
+    return __tact_context;
+}
+
+slice __tact_context_get_sender() inline {
+    return __tact_context_sender;
+}
+
+() $global_send((int, cell, cell, cell, int, slice, int) $params) impure asm """
+    NEWC
+    b{01} STSLICECONST  // store tag = $0 and ihr_disabled = true
+    1 STI               // store `bounce`
+    b{000} STSLICECONST // store bounced = false and src = addr_none
+    STSLICE             // store `to`
+    SWAP
+    STGRAMS             // store `value`
+    105 PUSHINT         // 1 + 4 + 4 + 64 + 32
+    STZEROES            // store currency_collection, ihr_fee, fwd_fee, created_lt and created_at
+    // → Stack state
+    // s0: Builder
+    // s1: `data`
+    // s2: `code`
+    // s3: `body`
+    // s4: `mode`
+
+    // Group 2: Placing the Builder after code and data, then checking those for nullability
+    s2 XCHG0
+    DUP2
+    ISNULL
+    SWAP
+    ISNULL
+    AND
+    // → Stack state
+    // s0: -1 (true) if `data` and `code` are both null, 0 (false) otherwise
+    // s1: `code`
+    // s2: `data`
+    // s3: Builder
+    // s4: `body`
+    // s5: `mode`
+
+    // Group 3: Left branch of the IFELSE, executed if s0 is -1 (true)
+    <{
+        DROP2 // drop `data` and `code`, since either of those is null
+        b{0} STSLICECONST
+    }> PUSHCONT
+
+    // Group 3: Right branch of the IFELSE, executed if s0 is 0 (false)
+    <{
+        // _ split_depth:(Maybe (## 5))
+        //   special:(Maybe TickTock)
+        //   code:(Maybe ^Cell)
+        //   data:(Maybe ^Cell)
+        //   library:(Maybe ^Cell)
+        // = StateInit;
+        ROT                // place message Builder on top
+        b{10} STSLICECONST // store Maybe = true, Either = false
+        // Start composing inlined StateInit
+        b{00} STSLICECONST // store split_depth and special first
+        STDICT             // store code
+        STDICT             // store data
+        b{0} STSLICECONST  // store library
+    }> PUSHCONT
+
+    // Group 3: IFELSE that does the branching shown above
+    IFELSE
+    // → Stack state
+    // s0: Builder
+    // s1: null or StateInit
+    // s2: `body`
+    // s3: `mode`
+
+    // Group 4: Finalizing the message
+    STDICT // store `body` as ref with an extra Maybe bit, since `body` might be null
+    ENDC
+    // → Stack state
+    // s0: Cell
+    // s1: `mode`
+
+    // Group 5: Sending the message, with `mode` on top
+    SWAP
+    SENDRAWMSG // https://github.com/tact-lang/tact/issues/1558
+""";
+
+() $global_cashback(slice $to) impure asm """
+    NEWC
+    x{42_} STSLICECONST // .storeUint(0x10, 6)
+    STSLICE          // .storeAddress(to)
+    0 PUSHINT        // 0
+    111 STUR         // .storeUint(0, 111)
+                     // 4 zeros for coins and 107 zeros for lt, fees, etc.
+    ENDC
+    66 PUSHINT       // SendRemainingValue | SendIgnoreErrors
+    SENDRAWMSG
+""";
+
+;; FeePayment_FeePayment.storage.fc
+;;
+;; Type: Context
+;; TLB: _ bounceable:bool sender:address value:int257 raw:^slice = Context
+;;
+
+_ $Context$_get_value((int, slice, int, slice) v) inline {
+    var (v'bounceable, v'sender, v'value, v'raw) = v;
+    return v'value;
+}
+
+;;
+;; Type: SendParameters
+;; TLB: _ mode:int257 body:Maybe ^cell code:Maybe ^cell data:Maybe ^cell value:int257 to:address bounce:bool = SendParameters
+;;
+
+((int, cell, cell, cell, int, slice, int)) $SendParameters$_constructor_to_value_bounce_mode(slice $to, int $value, int $bounce, int $mode) inline {
+    return ($mode, null(), null(), null(), $value, $to, $bounce);
+}
+
+;;
+;; Type: FeePayment
+;; TLB: _ owner:address feeNumerator:uint32 feeDenominator:uint32 = FeePayment
+;;
+
+builder $FeePayment$_store(builder build_0, (slice, int, int) v) inline {
+    var (v'owner, v'feeNumerator, v'feeDenominator) = v;
+    build_0 = build_0.store_slice(v'owner);
+    build_0 = build_0.store_uint(v'feeNumerator, 32);
+    build_0 = build_0.store_uint(v'feeDenominator, 32);
+    return build_0;
+}
+
+(slice, ((slice, int, int))) $FeePayment$_load(slice sc_0) inline {
+    var v'owner = sc_0~load_msg_addr();
+    var v'feeNumerator = sc_0~load_uint(32);
+    var v'feeDenominator = sc_0~load_uint(32);
+    return (sc_0, (v'owner, v'feeNumerator, v'feeDenominator));
+}
+
+(slice, int, int) $FeePayment$_contract_load() impure inline {
+    slice $sc = get_data().begin_parse();
+    return $sc~$FeePayment$_load();
+}
+
+() $FeePayment$_contract_store((slice, int, int) v) impure inline {
+    builder b = begin_cell();
+    b = $FeePayment$_store(b, v);
+    set_data(b.end_cell());
+}
+
+;;
+;; Contract FeePayment functions
+;;
+
+((slice, int, int), int) $FeePayment$_fun_getFeeNumerator((slice, int, int) $self) impure inline_ref {
+    var (($self'owner, $self'feeNumerator, $self'feeDenominator)) = $self;
+    var $fresh$ret_0 = $self'feeNumerator;
+    return (($self'owner, $self'feeNumerator, $self'feeDenominator), $fresh$ret_0);
+}
+
+((slice, int, int), int) $FeePayment$_fun_getFeeDenominator((slice, int, int) $self) impure inline_ref {
+    var (($self'owner, $self'feeNumerator, $self'feeDenominator)) = $self;
+    var $fresh$ret_1 = $self'feeDenominator;
+    return (($self'owner, $self'feeNumerator, $self'feeDenominator), $fresh$ret_1);
+}
+
+;;
+;; Get methods of a Contract FeePayment
+;;
+
+_ %getFeeNumerator() method_id(66904) {
+    var self = $FeePayment$_contract_load();
+    var res = self~$FeePayment$_fun_getFeeNumerator();
+    return res;
+}
+
+_ %getFeeDenominator() method_id(108932) {
+    var self = $FeePayment$_contract_load();
+    var res = self~$FeePayment$_fun_getFeeDenominator();
+    return res;
+}
+
+;;
+;; Routing of a Contract FeePayment
+;;
+
+;; message opcode reader utility: only binary receivers
+;; Returns 32 bit message opcode, otherwise throws the "Invalid incoming message" exit code
+(slice, int) ~load_opcode_internal(slice s) asm( -> 1 0) "32 LDUQ 130 THROWIFNOT";
+
+() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
+    
+    ;; Context
+    var cs = in_msg_cell.begin_parse();
+    cs~skip_bits(2);
+    var msg_bounceable = cs~load_int(1);
+    var msg_bounced = cs~load_int(1);
+    slice msg_sender_addr = cs~load_msg_addr();
+    __tact_context = (msg_bounceable, msg_sender_addr, msg_value, cs);
+    __tact_context_sender = msg_sender_addr;
+    
+    ;; Load contract data
+    var ($self'owner, $self'feeNumerator, $self'feeDenominator) = $FeePayment$_contract_load();
+    
+    ;; Handle bounced messages
+    if (msg_bounced) { return (); }
+    var op = in_msg~load_opcode_internal();
+    ;; Receive Payment message
+    if (op == 2607281167) {
+        var $msg'amount = in_msg~load_varuint16();
+        var $msg'recipient = in_msg~load_msg_addr();
+        int $fee = (($msg'amount * $self'feeNumerator) / $self'feeDenominator);
+        throw_unless(51754, ($Context$_get_value(__tact_context_get()) >= ($msg'amount + $fee)));
+        $global_send($SendParameters$_constructor_to_value_bounce_mode($msg'recipient, $msg'amount, false, 2));
+        $global_send($SendParameters$_constructor_to_value_bounce_mode($self'owner, $fee, false, 2));
+        $global_cashback(__tact_context_get_sender());
+        
+        return ();
+    }
+    
+    ;; Receive SetFee message
+    if (op == 3235881164) {
+        var $msg'numerator = in_msg~load_uint(32);
+        var $msg'denominator = in_msg~load_uint(32);
+        throw_unless(34358, ( equal_slices_bits(__tact_context_get_sender(), $self'owner) ));
+        $self'feeNumerator = $msg'numerator;
+        $self'feeDenominator = $msg'denominator;
+        $FeePayment$_contract_store(($self'owner, $self'feeNumerator, $self'feeDenominator));
+        return ();
+    }
+    
+    ;; Throw if not handled
+    throw(130);
+}
