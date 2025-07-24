@@ -7,7 +7,7 @@ Projetado para situações como viagens, rolês, festas ou pedidos coletivos, o 
 ## 🤖 Powered by IA + TON
 
 Este projeto combina duas tecnologias de ponta:
-- **Inteligência Artificial (IA)**: utilizamos um modelo de linguagem (LLM) para interpretar mensagens como “Paguei R$120 no Uber para mim e o João”, entendendo o contexto e calculando automaticamente os débitos e créditos entre os membros.
+- **Inteligência Artificial (IA)**: utilizamos um modelo de linguagem (LLM) para interpretar mensagens como “Paguei R$120 no Uber”, entendendo o contexto e calculando automaticamente os débitos e créditos entre os membros.
 - **Blockchain da TON**: os pagamentos são feitos diretamente com **Toncoin** ou **jUSDT**, de forma segura, transparente e descentralizada, via carteiras integradas no Telegram.
 
 ## 🚀 Funcionalidades
@@ -73,7 +73,7 @@ Monitora a blockchain da TON para identificar pagamentos em Toncoin ou jUSDT, e 
 3. Siga as instruções iniciais enviadas pelo bot.
 4. Registre despesas com o comando `/g`, por exemplo:
    ```
-   /g Eu paguei R$150 no jantar para mim, João e Ana.
+   /g Eu paguei R$150 no jantar
    ```
 5. Quando todos os gastos tiverem sido registrados, finalize com:
    ```
