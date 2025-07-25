@@ -34,7 +34,7 @@ Interface leve e responsiva acessível diretamente no Telegram.
 Gerencia as interações com os usuários, aciona o LLM, atualiza os dados e interage com os demais serviços.
 
 🔗 Repositório: [HackathonBot](https://github.com/senderro/HackathonBot)  
-☁️ Hospedagem: _(preencher com a plataforma usada)_
+☁️ Hospedagem: Render
 
 ---
 
@@ -50,7 +50,7 @@ Recebe frases do usuário, identifica quem pagou, o valor, os envolvidos e respo
 Monitora a blockchain da TON para identificar pagamentos em Toncoin ou jUSDT, e vincula os valores quitados ao sistema de dívidas do app.
 
 🔗 Repositório: [HackathonTransferencePolling](https://github.com/senderro/HackathonTransferencePolling) 
-☁️ Hospedagem: _(em breve)_
+☁️ Hospedagem: Render
 
 ---
 
